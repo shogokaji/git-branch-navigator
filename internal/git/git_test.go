@@ -102,3 +102,40 @@ func TestNew(t *testing.T) {
 		}
 	})
 }
+
+func TestGetCurrentBranch(t *testing.T) {
+	gitDir, _, cleanup := setupTestRepo(t)
+	defer cleanup()
+
+	// create repository
+	repo, err := New()
+	if err != nil {
+		t.Fatalf("failed to create repository: %v", err)
+	}
+
+	// move to git directory
+	if err := os.Chdir(gitDir); err != nil {
+		t.Fatalf("failed to change to git directory: %v", err)
+	}
+
+	// git switch test-branch-1
+	if err := exec.Command("git", "switch", "test-branch-1").Run(); err != nil {
+		t.Fatalf("failed to switch to test-branch-1: %v", err)
+	}
+
+	t.Run("get current branch", func(t *testing.T) {
+		branch, err := repo.GetCurrentBranch()
+
+		if err != nil {
+			t.Fatalf("GetCurrentBranch() error = %v, want nil", err)
+		}
+
+		if branch == "" {
+			t.Fatalf("GetCurrentBranch() returned empty string, want branch name")
+		}
+
+		if branch != "test-branch-1" {
+			t.Fatalf("GetCurrentBranch() returned %s, want test-branch-1", branch)
+		}
+	})
+}
