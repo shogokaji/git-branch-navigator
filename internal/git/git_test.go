@@ -128,15 +128,15 @@ func TestGetCurrentBranch(t *testing.T) {
 		branch, err := repo.GetCurrentBranch()
 
 		if err != nil {
-			t.Fatalf("GetCurrentBranch() error = %v, want nil", err)
+			t.Errorf("GetCurrentBranch() error = %v, want nil", err)
 		}
 
 		if branch == "" {
-			t.Fatalf("GetCurrentBranch() returned empty string, want branch name")
+			t.Errorf("GetCurrentBranch() returned empty string, want branch name")
 		}
 
 		if branch != "test-branch-1" {
-			t.Fatalf("GetCurrentBranch() returned %s, want test-branch-1", branch)
+			t.Errorf("GetCurrentBranch() returned %s, want test-branch-1", branch)
 		}
 	})
 }
@@ -163,19 +163,19 @@ func TestGetBranchHistory(t *testing.T) {
 	t.Run("get branch history", func(t *testing.T) {
 		branches, err := repo.GetBranchHistory()
 		if err != nil {
-			t.Fatalf("failed to get switch log: %v", err)
+			t.Errorf("failed to get switch log: %v", err)
 		}
 
 		if len(branches) != 2 {
-			t.Fatalf("GetBranchHistory() returned %d branches, want 2", len(branches))
+			t.Errorf("GetBranchHistory() returned %d branches, want 2", len(branches))
 		}
 
 		if branches[0] != "test-branch-1" {
-			t.Fatalf("GetBranchHistory() returned %s, want test-branch-1", branches[0])
+			t.Errorf("GetBranchHistory() returned %s, want test-branch-1", branches[0])
 		}
 
 		if branches[1] != "main" {
-			t.Fatalf("GetBranchHistory() returned %s, want main", branches[1])
+			t.Errorf("GetBranchHistory() returned %s, want main", branches[1])
 		}
 
 		clonedBranches := slices.Clone(branches)
@@ -183,7 +183,7 @@ func TestGetBranchHistory(t *testing.T) {
 		uniqueBranches := slices.Compact(clonedBranches)
 
 		if len(branches) != len(uniqueBranches) {
-			t.Fatalf("GetBranchHistory() returned %d unique branches, want %d", len(uniqueBranches), len(branches))
+			t.Errorf("GetBranchHistory() returned %d unique branches, want %d", len(uniqueBranches), len(branches))
 		}
 	})
 
