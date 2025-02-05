@@ -3,6 +3,7 @@ package git
 import (
 	"os"
 	"os/exec"
+	"slices"
 	"testing"
 )
 
@@ -138,4 +139,52 @@ func TestGetCurrentBranch(t *testing.T) {
 			t.Fatalf("GetCurrentBranch() returned %s, want test-branch-1", branch)
 		}
 	})
+}
+
+func TestGetBranchHistory(t *testing.T) {
+	gitDir, _, cleanup := setupTestRepo(t)
+	defer cleanup()
+
+	repo, err := New()
+	if err != nil {
+		t.Fatalf("failed to create repository: %v", err)
+	}
+
+	// move to git directory
+	if err := os.Chdir(gitDir); err != nil {
+		t.Fatalf("failed to change to git directory: %v", err)
+	}
+
+	// git switch test-branch-1
+	if err := exec.Command("git", "switch", "test-branch-1").Run(); err != nil {
+		t.Fatalf("failed to switch to test-branch-1: %v", err)
+	}
+
+	t.Run("get branch history", func(t *testing.T) {
+		branches, err := repo.GetBranchHistory()
+		if err != nil {
+			t.Fatalf("failed to get switch log: %v", err)
+		}
+
+		if len(branches) != 2 {
+			t.Fatalf("GetBranchHistory() returned %d branches, want 2", len(branches))
+		}
+
+		if branches[0] != "test-branch-1" {
+			t.Fatalf("GetBranchHistory() returned %s, want test-branch-1", branches[0])
+		}
+
+		if branches[1] != "main" {
+			t.Fatalf("GetBranchHistory() returned %s, want main", branches[1])
+		}
+
+		clonedBranches := slices.Clone(branches)
+		slices.Sort(clonedBranches)
+		uniqueBranches := slices.Compact(clonedBranches)
+
+		if len(branches) != len(uniqueBranches) {
+			t.Fatalf("GetBranchHistory() returned %d unique branches, want %d", len(uniqueBranches), len(branches))
+		}
+	})
+
 }
