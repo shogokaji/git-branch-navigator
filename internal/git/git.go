@@ -3,6 +3,7 @@ package git
 import (
 	"fmt"
 	"os/exec"
+	"strings"
 )
 
 type Repository struct{}
@@ -25,4 +26,15 @@ func validateEnvironment() error {
 	}
 
 	return nil
+}
+
+// GetCurrentBranch returns the name of the current branch
+func (r *Repository) GetCurrentBranch() (string, error) {
+	cmd := exec.Command("git", "branch", "--show-current")
+	bytes, err := cmd.Output()
+
+	if err != nil {
+		return "", fmt.Errorf("failed to get current branch: %v", err)
+	}
+	return strings.TrimSpace(string(bytes)), nil
 }
